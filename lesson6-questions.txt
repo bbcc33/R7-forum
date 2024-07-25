@@ -13,7 +13,6 @@ get, post, and delete routes. The / symbol defines the route path. users will ta
 and the paramater after either gets the id from the user or gets an action like new to create a new user or logon to 
 log the user in.
 
-
 3. What does the Rails db:migrate command do?
 
 table is created keeps track of what migrations have been applied
