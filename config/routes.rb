@@ -1,5 +1,15 @@
+
 Rails.application.routes.draw do
+  get 'posts/create'
+  get 'posts/new'
+  get 'posts/edit'
+  get 'posts/show'
+  get 'posts/update'
+  get 'posts/destroy'
+
+  root 'forums#index'
   # resources :users
+
   get '/users', to: 'users#index', as: 'users'
   get '/users/new', to: 'users#new', as: 'new_user'
   get '/users/:id', to: 'users#show', as: 'user'
@@ -9,7 +19,7 @@ Rails.application.routes.draw do
   post '/users/:id/logon', to: 'users#logon', as: 'user_logon'
   delete '/users/logoff', to: 'users#logoff', as: 'user_logoff' #this delete has to come before the other
   delete '/users/:id', to: 'users#delete'
-  root 'forums#index'
+  # root 'forums#index'
   resources :forums
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
