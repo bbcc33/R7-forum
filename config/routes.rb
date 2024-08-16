@@ -1,13 +1,14 @@
 
 Rails.application.routes.draw do
+  #resources :subscriptions
+  root 'forums#index'
+
   get 'posts/create'
   get 'posts/new'
   get 'posts/edit'
   get 'posts/show'
   get 'posts/update'
   get 'posts/destroy'
-
-  root 'forums#index'
   # resources :users
 
   get '/users', to: 'users#index', as: 'users'
@@ -19,8 +20,13 @@ Rails.application.routes.draw do
   post '/users/:id/logon', to: 'users#logon', as: 'user_logon'
   delete '/users/logoff', to: 'users#logoff', as: 'user_logoff' #this delete has to come before the other
   delete '/users/:id', to: 'users#delete'
-  # root 'forums#index'
-  resources :forums
+  resources :forums do
+    resources :posts, shallow: true, except: [:index]  
+    resources :subscriptions, shallow: true, except: [:index]
+  end
+  get '/subscription', to: 'subscription#index', as: 'subscriptions'
+
+
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
