@@ -1,27 +1,25 @@
 class SubscriptionsController < ApplicationController
-  before_action :set_current_user
-  before_action :set_subscription, only: %i[ show edit update destroy ]
   before_action :check_logon
   before_action :set_forum, only: %w[new create]
-  before_action :set_user, only: %w[new create]
+  before_action :set_subscription, only: %i[show edit update destroy]
 
   # GET /subscriptions or /subscriptions.json
   def index
     # @subscriptions = Subscription.
-    @forums = Forum.joins(:subscriptions).where(subscriptions: {user_id: @user.id}).order(:priority)
+    @forums = Forum.joins(:subscriptions).where(subscriptions: { user_id: @current_user.id }).order(:priority)
   end
 
   # GET /subscriptions/1 or /subscriptions/1.json
-  def show
-  end
+  def show; end
 
   # GET /subscriptions/new
   def new
-    if @forum.subscriptions.where(user_id: @user.id).any?
-      redirect_to forums_path, notice: "You are already subscribed to that forum."
+    if @forum.subscriptions.where(user_id: @current_user.id).any?
+      redirect_to forums_path, notice: 'You are already subscribed to that forum.'
     else
-      @subscription = @user.subscriptions.new # change
-      @subscription.forum_id = @forum.id      # change
+      @subscription = @current_user.subscriptions.new # change
+      @subscription.forum_id = @forum.id # change
+    end
   end
 
   # GET /subscriptions/1/edit
@@ -30,11 +28,11 @@ class SubscriptionsController < ApplicationController
 
   # POST /subscriptions or /subscriptions.json
   def create
-    @subscription = @user.subscriptions.new(subscription_params) # change
+    @subscription = @current_user.subscriptions.new(subscription_params) # change
 
     respond_to do |format|
       if @subscription.save
-        format.html { redirect_to subscription_url(@subscription), notice: "Subscription was successfully created." }
+        format.html { redirect_to subscription_url(@subscription), notice: 'Subscription was successfully created.' }
         format.json { render :show, status: :created, location: @subscription }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -47,7 +45,7 @@ class SubscriptionsController < ApplicationController
   def update
     respond_to do |format|
       if @subscription.update(subscription_params)
-        format.html { redirect_to subscription_url(@subscription), notice: "Subscription was successfully updated." }
+        format.html { redirect_to subscription_url(@subscription), notice: 'Subscription was successfully updated.' }
         format.json { render :show, status: :ok, location: @subscription }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -61,35 +59,32 @@ class SubscriptionsController < ApplicationController
     @subscription.destroy
 
     respond_to do |format|
-      format.html { redirect_to subscriptions_url, notice: "Subscription was successfully destroyed." }
+      format.html { redirect_to subscriptions_url, notice: 'Subscription was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_subscription
-      @subscription = Subscription.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def subscription_params
-      params.require(:subscription).permit(:forum_id, :user_id, :priority)
-    end
-
-        # in the private section
-    def check_logon 
-      if !@current_user
-        redirect_to forums_path, notice: "You can't access subscriptions unless you are logged in."
-      end
-    end
-
-    def set_current_user
-      @current_user = User.find(session[:user_id]) if session[:user_id]
-    end
-
-    def set_forum
-      @forum = Forum.find params[:forum_id]
-    end    
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_subscription
+    @subscription = Subscription.find(params[:id])
   end
+
+  # Only allow a list of trusted parameters through.
+  def subscription_params
+    params.require(:subscription).permit(:forum_id, :user_id, :priority)
+  end
+
+  # in the private section
+
+  def check_logon
+    return if @current_user
+
+    redirect_to forums_path, notice: "You can't access subscriptions unless you are logged in."
+  end
+
+  def set_forum
+    @forum = Forum.find params[:forum_id]
+  end
+end
